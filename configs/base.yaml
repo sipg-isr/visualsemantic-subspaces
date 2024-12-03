@@ -1,0 +1,38 @@
+defaults:
+  - _self_
+hydra:
+  job:
+    chdir: True
+    name: "${general.name}"
+  run:
+    dir: "${general.experiment_path}"
+general:
+  name: "experiment_base"
+  root: "/mnt/localdisk/gabriel/nodocker/nuclear"
+  experiment_path: "${general.root}/${general.name}"
+  device: "cuda:1"
+  distributed: False
+  seed: 13
+train:
+  dataset: "CELEBA"
+  max_epochs: 1500
+  max_steps: 100000
+  batch_size: 512
+  pin_memory: True
+  num_workers: 4
+  optimizer:
+    lr: 1e-4
+    momentum: 0.98
+  scheduler:
+    gamma: 0.1
+    step_size: 200
+  loss_coefs:
+    alpha: 0.99 #0.997
+    beta: 0.05
+val:
+  dataset: "CELEBA"
+  batch_size: 512
+  pin_memory: True
+  num_workers: 4
+model:
+  dim: 25
