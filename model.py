@@ -127,6 +127,7 @@ def compute_target_sigma(y_svals,
         return [np.array([m**2 / np.sqrt(m**2 + x**2)**3 for m in y_svals]).sum() + 2.0 * beta]
 
     sol = optimize.root(curve, [0.0], jac=grad, method='hybr')
+    
     return sol.x[0]
 
 
