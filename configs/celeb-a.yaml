@@ -10,7 +10,7 @@ general:
   name: ""
   root: "/mnt/localdisk/gabriel/nodocker/nuclear"
   experiment_path: "${general.root}/${general.name}"
-  device: "cuda:1"
+  device: "cuda:0"
   distributed: False
   seed: 13
   img_size: 32
