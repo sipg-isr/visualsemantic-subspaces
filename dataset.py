@@ -40,13 +40,13 @@ class CIFAR10Transform(object):
         return x
 
 class CELEBATransform(object):
-    def __init__(self, split: str) -> None:
+    def __init__(self, split: str, img_size: int) -> None:
         if split.lower() == "train":
-            self.transform = T.Compose([T.Resize(32),
+            self.transform = T.Compose([T.Resize(img_size),
                                         T.RandomHorizontalFlip(),
                                         T.ToTensor()])
         else:
-            self.transform = T.Compose([T.Resize(32),
+            self.transform = T.Compose([T.Resize(img_size),
                                         T.ToTensor()])
 
     def __call__(self, sample: Image) -> Tensor:
@@ -54,11 +54,13 @@ class CELEBATransform(object):
         return x
     
 class CELEBA(Dataset):
-    def __init__(self,
-                 root : str,
-                 split : str,
-                 class_select=None,
-                 transform=None):
+    def __init__(
+        self,
+        root : str,
+        split : str,
+        class_select=None,
+        transform=None
+    ) -> None:
         super(CELEBA, self).__init__()
 
         self.root = root
@@ -133,7 +135,7 @@ def get_weighted_sampler(targets : List[List]):
 
 
 class MintermSampler():
-    def __init__(self, targets: List[List[int]], batch_size: int):
+    def __init__(self, targets: List[List[int]], batch_size: int) -> None:
         self._batch_size = batch_size
         self._n_samples = len(targets)
         self._n_literals = len(targets[0])
@@ -162,13 +164,14 @@ class MintermSampler():
             batch = np.concatenate(batch)
             yield (batch)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return self._n_batches
 
 
 def get_loader(
     dataset,
     split: str,
+    img_size: int,
     batch_size: int,
     num_workers: int,
     pin_memory: bool
@@ -202,7 +205,7 @@ def get_loader(
                           "Wearing_Hat",
                           "Male"],
             split=split, 
-            transform=CELEBATransform(split),
+            transform=CELEBATransform(split=split, img_size=img_size),
         )
 
         if split == "train":

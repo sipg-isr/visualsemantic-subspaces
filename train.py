@@ -44,6 +44,7 @@ def main(cfg: DictConfig) -> None:
     train_loader = get_loader(
         dataset=cfg.train.dataset,
         split="train",
+        img_size=cfg.general.img_size,
         batch_size=cfg.train.batch_size,
         num_workers=cfg.train.num_workers,
         pin_memory=cfg.train.pin_memory,
@@ -52,6 +53,7 @@ def main(cfg: DictConfig) -> None:
     val_loader = get_loader(
         dataset=cfg.val.dataset,
         split="val",
+        img_size=cfg.general.img_size,
         batch_size=cfg.val.batch_size,
         num_workers=cfg.val.num_workers,
         pin_memory=cfg.val.pin_memory,
