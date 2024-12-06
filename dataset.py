@@ -44,6 +44,8 @@ class CELEBATransform(object):
         if split.lower() == "train":
             self.transform = T.Compose([T.Resize(img_size),
                                         T.RandomHorizontalFlip(),
+                                        T.ColorJitter(0.2,0.2,0.2,0.1),
+                                        T.RandomGrayscale(p=0.5),
                                         T.ToTensor()])
         else:
             self.transform = T.Compose([T.Resize(img_size),
@@ -156,7 +158,11 @@ class MintermSampler():
 
     def __iter__(self):        
         for _ in range(self._n_batches):
-            sel = np.random.choice(np.arange(self._n_minterms), self._n_literals, replace=False)
+            sel = np.random.choice(
+                np.arange(self._n_minterms),
+                self._n_literals,
+                replace=False
+            )
             batch = []
             for minterm_label in sel:
                 batch.append(np.random.choice(self._minterm2idx[minterm_label],
@@ -174,14 +180,18 @@ def get_loader(
     img_size: int,
     batch_size: int,
     num_workers: int,
-    pin_memory: bool
+    pin_memory: bool,
+    persistent_workers: bool,
 ) -> DataLoader:
-    split   = split.lower()
+    split = split.lower()
     dataset = dataset.upper()
+
+    cifar10_root = "/mnt/localdisk/gabriel/nodocker/CIFAR10"
+    celeb_a_root = "/mnt/localdisk/gabriel/nodocker/CELEBA"
 
     if dataset == "CIFAR10":
         dataset = CIFAR10(
-            root="/mnt/localdisk/gabriel/nodocker/CIFAR10",
+            root=cifar10_root,
             train=(split == "train"),
             download=True,
             target_transform=lambda idx : F.one_hot(torch.tensor(idx), num_classes=10),
@@ -193,12 +203,13 @@ def get_loader(
             batch_size=batch_size,
             shuffle=(split == "train"),
             pin_memory=pin_memory,
-            num_workers=num_workers
+            num_workers=num_workers,
+            persistent_workers=persistent_workers,
         )
             
     if dataset == "CELEBA":
         dataset = CELEBA(
-            root="/mnt/localdisk/gabriel/nodocker/CELEBA",
+            root=celeb_a_root,
             class_select=["Bald",
                           "Eyeglasses",
                           "Wearing_Necktie",
@@ -216,6 +227,7 @@ def get_loader(
                 batch_sampler=MintermSampler(dataset.targets, batch_size),
                 pin_memory=pin_memory,
                 num_workers=num_workers,
+                persistent_workers=persistent_workers,
                 collate_fn=dataset.collate_fn,
             )
         else:
@@ -225,6 +237,7 @@ def get_loader(
                 shuffle=False,
                 pin_memory=pin_memory,
                 num_workers=num_workers,
+                persistent_workers=persistent_workers,
                 collate_fn=dataset.collate_fn,
             )   
             

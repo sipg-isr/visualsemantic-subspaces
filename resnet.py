@@ -3,18 +3,19 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 
-from typing import List
+from typing import List, Callable
 
 class BasicBlock(nn.Module):
     expansion = 1
-
     def __init__(
         self,
         in_planes: int,
         planes: int,
-        stride: int=1
+        activation: Callable,
+        stride: int=1,
     ) -> None:
         super(BasicBlock, self).__init__()
+        self.activation = activation
         self.conv1 = nn.Conv2d(
             in_planes,
             planes,
@@ -48,10 +49,10 @@ class BasicBlock(nn.Module):
             )
 
     def forward(self, x: Tensor) -> Tensor:
-        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.activation(self.bn1(self.conv1(x)))
         out = self.bn2(self.conv2(out))
         out += self.shortcut(x)
-        out = F.relu(out)
+        out = self.activation(out)
         return out
 
 
@@ -62,14 +63,18 @@ class Bottleneck(nn.Module):
         self,
         in_planes: int,
         planes: int,
-        stride: int=1
+        activation: Callable,
+        stride: int=1,
     ) -> None:
         super(Bottleneck, self).__init__()
+        self.activation = activation
         self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
+
         self.conv2 = nn.Conv2d(planes, planes, kernel_size=3,
                                stride=stride, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
+
         self.conv3 = nn.Conv2d(planes, self.expansion *
                                planes, kernel_size=1, bias=False)
         self.bn3 = nn.BatchNorm2d(self.expansion*planes)
@@ -83,11 +88,11 @@ class Bottleneck(nn.Module):
             )
 
     def forward(self, x: Tensor) -> Tensor:
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = F.relu(self.bn2(self.conv2(out)))
+        out = self.activation(self.bn1(self.conv1(x)))
+        out = self.activation(self.bn2(self.conv2(out)))
         out = self.bn3(self.conv3(out))
         out += self.shortcut(x)
-        out = F.relu(out)
+        out = self.activation(out)
         return out
 
 
@@ -96,9 +101,11 @@ class ResNet(nn.Module):
         self,
         block: nn.Module,
         num_blocks: List[int],
-        out_dim: int
+        out_dim: int,
+        activation: Callable, 
     ) -> None:
         super(ResNet, self).__init__()
+        self.activation = activation
         self.in_planes = 64
 
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3,
@@ -120,12 +127,12 @@ class ResNet(nn.Module):
         strides = [stride] + [1]*(num_blocks-1)
         layers = []
         for stride in strides:
-            layers.append(block(self.in_planes, planes, stride))
+            layers.append(block(self.in_planes, planes, self.activation, stride))
             self.in_planes = planes * block.expansion
         return nn.Sequential(*layers)
 
     def forward(self, x: Tensor) -> Tensor:
-        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.activation(self.bn1(self.conv1(x)))
         out = self.layer1(out)
         out = self.layer2(out)
         out = self.layer3(out)
@@ -136,23 +143,23 @@ class ResNet(nn.Module):
         return out
 
 
-def resnet18(dim):
-    return ResNet(BasicBlock, [2, 2, 2, 2], dim)
+def resnet18(dim: int, activation: Callable) -> nn.Module:
+    return ResNet(BasicBlock, [2, 2, 2, 2], dim, activation)
 
 
-def resnet34(dim):
-    return ResNet(BasicBlock, [3, 4, 6, 3], dim)
+def resnet34(dim: int, activation: Callable) -> nn.Module:
+    return ResNet(BasicBlock, [3, 4, 6, 3], dim, activation)
 
 
-def resnet50(dim):
-    return ResNet(Bottleneck, [3, 4, 6, 3], dim)
+def resnet50(dim: int, activation: Callable) -> nn.Module:
+    return ResNet(Bottleneck, [3, 4, 6, 3], dim, activation)
 
 
-def resnet101(dim):
-    return ResNet(Bottleneck, [3, 4, 23, 3], dim)
+def resnet101(dim: int, activation: Callable) -> nn.Module:
+    return ResNet(Bottleneck, [3, 4, 23, 3], dim, activation)
 
 
-def resnet152(dim):
-    return ResNet(Bottleneck, [3, 8, 36, 3], dim)
+def resnet152(dim: int, activation: Callable) -> nn.Module:
+    return ResNet(Bottleneck, [3, 8, 36, 3], dim, activation)
 
 

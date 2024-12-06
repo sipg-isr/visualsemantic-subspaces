@@ -4,10 +4,10 @@ import torch.nn.functional as F
 
 from torch import Tensor
 
-from resnet import resnet18
+from resnet import *
 from dataset import Batch
 
-from typing import Dict, Union, Tuple 
+from typing import Dict, Union, Tuple, Callable
 
 import logging
 
@@ -15,13 +15,14 @@ class Model(nn.Module):
     def __init__(
         self,
         dim: int,
+        activation: Callable,
         alpha: float,
         beta: float,
         device: Union[str, torch.device],
     ) -> None:
         super(Model, self).__init__()
 
-        self._backbone = resnet18(dim)
+        self._backbone = resnet18(dim, activation)
         self._alpha = alpha
         self._beta = beta
         self._device = device
@@ -52,7 +53,7 @@ class Model(nn.Module):
 
         z = torch.cat((data.labels.permute(1,0), 
                        x.permute(1,0)), dim=0)
-        
+
         z_svals = torch.linalg.svdvals(z)
         x_svals = torch.linalg.svdvals(x)
 

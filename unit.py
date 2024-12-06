@@ -15,13 +15,15 @@ from torcheval.metrics import MulticlassAccuracy
 from dataset import Batch
 
 class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
-    def __init__(self,
-                 module: nn.Module,
-                 optimizer: torch.optim.Optimizer,
-                 lr_scheduler,
-                 device: Union[str, torch.device],
-                 tb_logger: TensorBoardLogger,
-                 cfg: DictConfig) -> None:
+    def __init__(
+        self,
+        module: nn.Module,
+        optimizer: torch.optim.Optimizer,
+        lr_scheduler,
+        device: Union[str, torch.device],
+        tb_logger: TensorBoardLogger,
+        cfg: DictConfig
+    ) -> None:
         super().__init__()
 
         self._module = module
@@ -31,7 +33,7 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
         self._tb_logger = tb_logger
         self._cfg = cfg
 
-        self._metrics = {"multiclass_accuracy": MulticlassAccuracy()}
+        self._metrics = {"multiclass_accuracy" : MulticlassAccuracy()}
 
     def train_step(self, state: State, data: Batch) -> None:
         self._module.train()
@@ -47,6 +49,7 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
         self._optimizer.step()
 
         if step_count % 5 == 0 and get_global_rank() == 0:
+            self._module.eval()
             minterm_preds, minterm_targets = self._module.evaluate(data)
             self._metrics["multiclass_accuracy"].update(minterm_preds, minterm_targets)
             self._tb_logger.log("loss/train", output["loss"].detach(), step_count)

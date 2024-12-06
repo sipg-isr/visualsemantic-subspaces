@@ -5,10 +5,9 @@ import hydra
 from omegaconf import DictConfig
 
 import torch
-from torch.optim import SGD
+from torch.optim import SGD, Adam
 from torch.optim.lr_scheduler import StepLR
 
-from utils import *
 from model import Model
 from dataset import *
 
@@ -48,6 +47,7 @@ def main(cfg: DictConfig) -> None:
         batch_size=cfg.train.batch_size,
         num_workers=cfg.train.num_workers,
         pin_memory=cfg.train.pin_memory,
+        persistent_workers=cfg.val.persistent_workers,
     )
     
     val_loader = get_loader(
@@ -57,10 +57,12 @@ def main(cfg: DictConfig) -> None:
         batch_size=cfg.val.batch_size,
         num_workers=cfg.val.num_workers,
         pin_memory=cfg.val.pin_memory,
+        persistent_workers=cfg.val.persistent_workers,
     )
     
     module = Model(
         dim=cfg.model.dim,
+        activation=torch.nn.functional.leaky_relu,
         alpha=cfg.train.loss_coefs.alpha,
         beta=cfg.train.loss_coefs.beta,
         device=device,
@@ -109,4 +111,3 @@ def main(cfg: DictConfig) -> None:
 
 if __name__ == "__main__":
     main()
-
