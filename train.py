@@ -65,8 +65,17 @@ def main(cfg: DictConfig) -> None:
         activation=torch.nn.functional.leaky_relu,
         alpha=cfg.train.loss_coefs.alpha,
         beta=cfg.train.loss_coefs.beta,
+        kernel=cfg.model.kernel,
         device=device,
     ).to(device)
+
+    if cfg.model.pretrained is not None:
+        state_dict = torch.load(
+            cfg.model.pretrained,
+            map_location=device,
+            weights_only=True
+        )
+        module.load_state_dict(state_dict)
 
     optimizer = SGD(
         module.parameters(),

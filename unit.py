@@ -2,6 +2,8 @@ import os
 
 from omegaconf import DictConfig
 from typing import Union
+import logging
+
 import torch 
 import torch.nn as nn
 
@@ -13,6 +15,7 @@ from torchtnt.utils.loggers.tensorboard import TensorBoardLogger
 from torcheval.metrics import MulticlassAccuracy
 
 from dataset import Batch
+
 
 class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
     def __init__(
@@ -45,16 +48,28 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
 
         output = self._module(data)
 
-        output["loss"].backward()
+        try:
+            output["loss"].backward()
+        except:
+            logging.error("Error in backward pass")
+
+        if self._cfg.train.optimizer.clip_grad_norm is not None:
+            nn.utils.clip_grad_norm_(
+                self._module.parameters(),
+                self._cfg.train.optimizer.clip_grad_norm
+            )
         self._optimizer.step()
 
-        if step_count % 5 == 0 and get_global_rank() == 0:
+        if (step_count+1) % 100 == 0 and get_global_rank() == 0:
             self._module.eval()
+            self._module.update_minterms()
             minterm_preds, minterm_targets = self._module.evaluate(data)
             self._metrics["multiclass_accuracy"].update(minterm_preds, minterm_targets)
             self._tb_logger.log("loss/train", output["loss"].detach(), step_count)
 
     def on_train_epoch_end(self, state: State) -> None:
+        self._module.update_minterms()
+        
         step_count = self.train_progress.num_steps_completed
 
         self._lr_scheduler.step()
@@ -63,7 +78,9 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
             torch.save(self._module.state_dict(), f)
         
         # Log inner products of basis vectors
-        kernel2 = (self._module._minterm_vecs @ self._module._minterm_vecs.T) ** 2
+        x = torch.cat(self._module._minterm_samples, dim=0)
+        x = x[torch.randperm(len(x))[:512].sort()[0]]
+        kernel2 = self._module.kernel(x, x) ** 2
         self._tb_logger.writer.add_image("Minterm kernel", kernel2, step_count, dataformats="HW")
 
         for metric_name, metric in self._metrics.items():

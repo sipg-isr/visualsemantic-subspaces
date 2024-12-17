@@ -20,7 +20,6 @@ class Batch:
     images: Tensor = None
     labels: Tensor = None
 
-
 class CIFAR10Transform(object):
     def __init__(self, split: str) -> None:
         mu  = (0.4914, 0.4822, 0.4465)
@@ -44,8 +43,6 @@ class CELEBATransform(object):
         if split.lower() == "train":
             self.transform = T.Compose([T.Resize(img_size),
                                         T.RandomHorizontalFlip(),
-                                        T.ColorJitter(0.2,0.2,0.2,0.1),
-                                        T.RandomGrayscale(p=0.5),
                                         T.ToTensor()])
         else:
             self.transform = T.Compose([T.Resize(img_size),
@@ -222,8 +219,6 @@ def get_loader(
         if split == "train":
             dataloader = DataLoader(
                 dataset,
-                #batch_size=batch_size,
-                #sampler=get_weighted_sampler(dataset.targets),
                 batch_sampler=MintermSampler(dataset.targets, batch_size),
                 pin_memory=pin_memory,
                 num_workers=num_workers,

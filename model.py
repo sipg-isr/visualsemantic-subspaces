@@ -3,11 +3,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from torch import Tensor
-
+from torch.linalg import svdvals, eigvalsh, svd, eig, eigh, inv
 from resnet import *
 from dataset import Batch
 
-from typing import Dict, Union, Tuple, Callable
+from typing import Dict, Union, Tuple, Callable, Optional
 
 import logging
 
@@ -18,25 +18,31 @@ class Model(nn.Module):
         activation: Callable,
         alpha: float,
         beta: float,
+        kernel: str,
         device: Union[str, torch.device],
     ) -> None:
         super(Model, self).__init__()
 
-        self._backbone = resnet18(dim, activation)
+        self._dim = dim
         self._alpha = alpha
         self._beta = beta
+        self._kernel = kernel
         self._device = device
+
+        self._backbone = resnet18(dim + int(kernel != "euclidean"), activation)
 
         self._memory_x = []
         self._memory_y = []
-        self._minterms = None
-        self._minterm_vecs = None
+        self._minterms = []
+        self._minterm_evecs = []
+        self._minterm_samples = []
 
     def forget(self) -> None:
         self._memory_x = []
         self._memory_y = []
-        self._minterms = None
-        self._minterm_vecs = None
+        self._minterms = []
+        self._minterm_evecs = []
+        self._minterm_samples = []
         logging.info("Memory reset")
 
     def remember(self, x: Tensor, data: Batch) -> None:
@@ -44,18 +50,35 @@ class Model(nn.Module):
         self._memory_y.append(data.labels.cpu())
 
     def embed(self, data: Batch) -> Tensor:
-        return self._backbone(data.images)
+        feat = self._backbone(data.images)
+        if self._kernel == "euclidean":
+            return feat, None
+        else:
+            x, norm = torch.split(feat, (self._dim, 1), -1)
+            return x, norm
+
+    def kernel(self, x1: Tensor, x2: Tensor) -> Tensor:
+        if self._kernel == "euclidean":
+            return x1.T @ x2
+        elif self._kernel == "gaussian":
+            return torch.exp(-(torch.cdist(x1, x2, p=2)**2))
+        else:
+            raise NotImplemented(f"Unknown kernel {self._kernel}")
 
     def forward(self, data: Batch) -> Dict[str, Tensor]:
-        x = self.embed(data)
+        x, norm = self.embed(data)
+        y = data.labels.float()
+
+        if self._kernel == "euclidean":
+            z = torch.cat((y.T, x.T), dim=0)
+            z_svals = svdvals(z)
+            x_svals = svdvals(x)
+        else:
+            kernel = norm.view(1,-1) * self.kernel(x,x) * norm.view(-1,1)
+            z_svals = torch.sqrt(F.relu(eigvalsh(y @ y.T + kernel)))
+            x_svals = torch.sqrt(F.relu(eigvalsh(kernel)))
 
         self.remember(x, data)
-
-        z = torch.cat((data.labels.permute(1,0), 
-                       x.permute(1,0)), dim=0)
-
-        z_svals = torch.linalg.svdvals(z)
-        x_svals = torch.linalg.svdvals(x)
 
         loss = z_svals.sum()
         loss -= self._alpha * x_svals.sum()
@@ -64,9 +87,9 @@ class Model(nn.Module):
         output = {"x_svals" : x_svals,
                   "z_svals" : z_svals,
                   "loss" : loss}
-
         return output
 
+    @torch.no_grad()
     def update_minterms(self) -> None:
         if len(self._memory_x) == 0:
             return None
@@ -74,39 +97,70 @@ class Model(nn.Module):
         memory_x = torch.cat(self._memory_x, dim=0).to(self._device)
         memory_y = torch.cat(self._memory_y, dim=0).to(self._device)
 
-        self._minterms = torch.unique(memory_y, dim=0)
+        self._minterms = [] 
+        self._minterm_evecs = []
+        self._minterm_samples = []
 
-        minterm_vecs = []
-
-        for minterm in self._minterms:
+        minterms = torch.unique(memory_y, dim=0)
+        for minterm in minterms:
             mask = (memory_y == minterm).all(dim=-1)
-            selected_embeddings = memory_x[mask, :]
-            U, _, _ = torch.linalg.svd(selected_embeddings.T)
-            minterm_vecs.append(U[:,:1].T)
+            minterm_samples = memory_x[mask, :]
+            
+            if self._kernel == "euclidean":
+                U, _, _ = svd(minterm_samples.T)
+                self._minterm_evecs.append(U[:,:1].T)
+                self._minterms.append(minterm)
+                self._minterm_samples.append(minterm_samples)
+            else:
+                K = self.kernel(minterm_samples, minterm_samples)
+                try:
+                    lbds, U = eigh(K)
+                except:
+                    logging.error(f"eigh error minterm {minterm}")
+                else:
+                    self._minterms.append(minterm)
 
-        self._minterm_vecs = torch.cat(minterm_vecs, dim=0)
+                    lbd_mask = (lbds / len(minterm_samples)) > 0.05
+                    self._minterm_evecs.append(U[:,lbd_mask].T / torch.sqrt(lbds[lbd_mask].view(-1,1)))
+                    self._minterm_samples.append(minterm_samples)
 
+    @torch.no_grad()
     def evaluate(self, data: Batch) -> Tuple[Tensor, Tensor]:        
         batch_size = data.images.shape[0]
 
-        self.update_minterms()
-
         if self._minterms is None:
-            return torch.tensor(0.0), None
+            return torch.tensor([0]), torch.tensor([0])
 
-        x = self.embed(data)
-        x = F.normalize(x, dim=-1, p=2)
+        logging.info(f"Eval with {len(self._minterms)} minterms")
 
+        # Create minterm labels (ficticious labels)
         minterm_labels = torch.full((batch_size,), -1.0, device=self._device)
-
-        logging.info(f"Evaluating with {len(self._minterms)} minterms")
-
         for i, minterm in enumerate(self._minterms):
             mask = (data.labels == minterm).all(dim=-1)
             minterm_labels.masked_fill_(mask, i)
 
-        p = torch.square(x @ self._minterm_vecs.T)
+        x_query, _ = self.embed(data)
 
+        if self._kernel == "euclidean":
+            self._minterm_evecs = torch.cat(self._minterm_evecs, dim=0)
+            x_query = F.normalize(x_query, dim=-1, p=2)
+            p = torch.square(x_query @ self._minterm_evecs.T)
+        else:
+            p = []
+            for i in range(len(self._minterms)):
+                # kernel: (batch_size, n_minterm_samples)
+                kernel_memory_query = self.kernel(x_query, self._minterm_samples[i])
+
+                # (batch_size, n_evecs)
+                projections = torch.einsum(
+                    "bj,kj->bk",
+                    kernel_memory_query,
+                    self._minterm_evecs[i]
+                )
+                
+                p.append(torch.square(projections).sum(-1).view(-1,1))
+            p = torch.cat(p, dim=-1)
+            
         predictions = torch.argmax(p, dim=-1)
 
         return predictions[minterm_labels > -1], minterm_labels[minterm_labels > -1]

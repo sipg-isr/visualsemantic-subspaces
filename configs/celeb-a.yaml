@@ -10,14 +10,14 @@ general:
   name: ""
   root: "/mnt/localdisk/gabriel/nodocker/nuclear"
   experiment_path: "${general.root}/${general.name}"
-  device: "cuda:0"
+  device: "cuda:1"
   distributed: False
   seed: 13
   img_size: 40
 train:
   dataset: "CELEBA"
-  max_epochs: 400
-  max_steps: 100000
+  max_epochs: 1000
+  max_steps: Null
   batch_size: 512
   pin_memory: True
   num_workers: 4
@@ -25,9 +25,10 @@ train:
   optimizer:
     lr: 1e-4
     momentum: 0.98
+    clip_grad_norm: Null
   scheduler:
     gamma: 0.5
-    step_size: 200
+    step_size: 400
   loss_coefs:
     alpha: 0.99
     beta: 0.05
@@ -39,3 +40,5 @@ val:
   persistent_workers: True
 model:
   dim: 25
+  kernel: "euclidean"
+  pretrained: Null
