@@ -100,6 +100,7 @@ class ResNet(nn.Module):
         self,
         block: nn.Module,
         num_blocks: List[int],
+        in_dim: int,
         out_dim: int,
         activation: Callable, 
     ) -> None:
@@ -107,7 +108,7 @@ class ResNet(nn.Module):
         self.activation = activation
         self.in_planes = 64
 
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3,
+        self.conv1 = nn.Conv2d(in_dim, 64, kernel_size=3,
                                stride=1, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.layer1 = self._make_layer(block, 64, num_blocks[0], stride=1)
@@ -142,23 +143,17 @@ class ResNet(nn.Module):
         return out
 
 
-def resnet18(dim: int, activation: Callable) -> nn.Module:
-    return ResNet(BasicBlock, [2, 2, 2, 2], dim, activation)
+def resnet18(in_dim: int, out_dim: int, activation: Callable) -> nn.Module:
+    return ResNet(BasicBlock, [2, 2, 2, 2], in_dim, out_dim, activation)
 
 
-def resnet34(dim: int, activation: Callable) -> nn.Module:
-    return ResNet(BasicBlock, [3, 4, 6, 3], dim, activation)
+def resnet34(in_dim: int, out_dim: int, activation: Callable) -> nn.Module:
+    return ResNet(BasicBlock, [3, 4, 6, 3], in_dim, out_dim, activation)
 
 
-def resnet50(dim: int, activation: Callable) -> nn.Module:
-    return ResNet(Bottleneck, [3, 4, 6, 3], dim, activation)
+def resnet50(in_dim: int, out_dim: int, activation: Callable) -> nn.Module:
+    return ResNet(Bottleneck, [3, 4, 6, 3], in_dim, out_dim, activation)
 
 
-def resnet101(dim: int, activation: Callable) -> nn.Module:
-    return ResNet(Bottleneck, [3, 4, 23, 3], dim, activation)
-
-
-def resnet152(dim: int, activation: Callable) -> nn.Module:
-    return ResNet(Bottleneck, [3, 8, 36, 3], dim, activation)
-
-
+def resnet101(in_dim: int, out_dim: int, activation: Callable) -> nn.Module:
+    return ResNet(Bottleneck, [3, 4, 23, 3], in_dim, out_dim, activation)

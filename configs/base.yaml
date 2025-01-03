@@ -9,13 +9,13 @@ hydra:
 general:
   name: ""
   root: "/mnt/localdisk/gabriel/nodocker/nuclear"
-  experiment_path: "${general.root}/${general.name}"
-  device: "cuda:1"
+  experiment_path: "${general.root}/experiments/${general.name}"
+  device: "cuda:0"
   distributed: False
   seed: 13
   img_size: 40
 train:
-  dataset: "CELEBA"
+  dataset: ""
   max_epochs: 1000
   max_steps: Null
   batch_size: 512
@@ -25,6 +25,7 @@ train:
   optimizer:
     lr: 1e-4
     momentum: 0.98
+    weight_decay: 0.0
     clip_grad_norm: Null
   scheduler:
     gamma: 0.5
@@ -33,12 +34,14 @@ train:
     alpha: 0.99
     beta: 0.05
 val:
-  dataset: "CELEBA"
+  dataset: ""
   batch_size: 512
   pin_memory: True
   num_workers: 4
   persistent_workers: True
 model:
-  dim: 25
-  kernel: "euclidean"
+  backbone: "resnet18"
+  dim_out: 25
+  dim_in: 3
+  kernel: "linear"
   pretrained: Null

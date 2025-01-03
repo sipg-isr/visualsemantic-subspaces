@@ -1,7 +1,7 @@
 import os
 
 from omegaconf import DictConfig
-from typing import Union
+from typing import Union, Dict
 import logging
 
 import torch 
@@ -38,14 +38,18 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
 
         self._metrics = {"multiclass_accuracy" : MulticlassAccuracy()}
 
+    def tb_log_metrics(self, split: str) -> None:
+        step_count = self.train_progress.num_steps_completed
+        for metric_name, metric in self._metrics.items():
+            name = f"{metric_name}/{split}"
+            self._tb_logger.log(name, metric.compute(), step_count)
+            metric.reset()
+
     def train_step(self, state: State, data: Batch) -> None:
         self._module.train()
         self._optimizer.zero_grad()
 
-        step_count = self.train_progress.num_steps_completed
-
         data = copy_data_to_device(data, device=self._device)
-
         output = self._module(data)
 
         try:
@@ -60,12 +64,17 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
             )
         self._optimizer.step()
 
-        if (step_count+1) % 100 == 0 and get_global_rank() == 0:
+        step_count = self.train_progress.num_steps_completed
+
+        if (step_count+1) % 50 == 0 and get_global_rank() == 0:
+            self._tb_logger.log("loss/train", output["loss"].detach(), step_count)
+            self._tb_logger.log("x norm/train", output["x_norm"].detach(), step_count)
+            self._tb_logger.log("z norm/train", output["z_norm"].detach(), step_count)
+        
             self._module.eval()
             self._module.update_minterms()
             minterm_preds, minterm_targets = self._module.evaluate(data)
             self._metrics["multiclass_accuracy"].update(minterm_preds, minterm_targets)
-            self._tb_logger.log("loss/train", output["loss"].detach(), step_count)
 
     def on_train_epoch_end(self, state: State) -> None:
         self._module.update_minterms()
@@ -80,12 +89,10 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
         # Log inner products of basis vectors
         x = torch.cat(self._module._minterm_samples, dim=0)
         x = x[torch.randperm(len(x))[:512].sort()[0]]
-        kernel2 = self._module.kernel(x, x) ** 2
-        self._tb_logger.writer.add_image("Minterm kernel", kernel2, step_count, dataformats="HW")
+        K = self._module.kernel(x, x)
+        self._tb_logger.writer.add_image("Minterm kernel", K ** 2, step_count, dataformats="HW")
 
-        for metric_name, metric in self._metrics.items():
-            self._tb_logger.log(f"{metric_name}/train", metric.compute(), step_count)
-            metric.reset()
+        self.tb_log_metrics("train")
 
     @torch.no_grad()
     def eval_step(self, state: State, data: Batch) -> None:
@@ -95,13 +102,8 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
         self._metrics["multiclass_accuracy"].update(minterm_preds, minterm_targets)
 
     def on_eval_epoch_end(self, state: State) -> None:
-        step_count = self.train_progress.num_steps_completed
-    
+        self.tb_log_metrics("val")
         self._module.forget()
-
-        for metric_name, metric in self._metrics.items():
-            self._tb_logger.log(f"{metric_name}/val", metric.compute(), step_count)
-            metric.reset()
 
     def predict_step(self, state: State, data: Batch) -> None:
         pass

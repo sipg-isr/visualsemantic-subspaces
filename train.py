@@ -5,8 +5,8 @@ import hydra
 from omegaconf import DictConfig
 
 import torch
-from torch.optim import SGD, Adam
-from torch.optim.lr_scheduler import StepLR
+from torch.optim import SGD
+from torch.optim.lr_scheduler import StepLR, CosineAnnealingLR
 
 from model import Model
 from dataset import *
@@ -61,7 +61,9 @@ def main(cfg: DictConfig) -> None:
     )
     
     module = Model(
-        dim=cfg.model.dim,
+        dim_in=cfg.model.dim_in,
+        dim_out=cfg.model.dim_out,
+        backbone=cfg.model.backbone,
         activation=torch.nn.functional.leaky_relu,
         alpha=cfg.train.loss_coefs.alpha,
         beta=cfg.train.loss_coefs.beta,
@@ -81,6 +83,7 @@ def main(cfg: DictConfig) -> None:
         module.parameters(),
         lr=cfg.train.optimizer.lr,
         momentum=cfg.train.optimizer.momentum,
+        weight_decay=cfg.train.optimizer.weight_decay,
     )
 
     lr_scheduler = StepLR(
@@ -88,6 +91,7 @@ def main(cfg: DictConfig) -> None:
         cfg.train.scheduler.step_size,
         gamma=cfg.train.scheduler.gamma,
     )
+    # lr_scheduler = CosineAnnealingLR(optimizer, cfg.train.max_epochs, 5e-5)
 
     tb_logger = TensorBoardLogger(tb_path)
     lr_monitor = LearningRateMonitor(tb_logger)

@@ -10,17 +10,17 @@ import torchvision.transforms as T
 from torch import Tensor
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
-from torchvision.datasets import CIFAR10
+from torchvision.datasets import CIFAR10, CIFAR100, MNIST, FashionMNIST
 from torch.utils.data.sampler import WeightedRandomSampler
 
-from typing import List
+from typing import List, Optional, Tuple
 
 @dataclass
 class Batch:
     images: Tensor = None
     labels: Tensor = None
 
-class CIFAR10Transform(object):
+class CIFARTransform(object):
     def __init__(self, split: str) -> None:
         mu  = (0.4914, 0.4822, 0.4465)
         std = (0.2023, 0.1994, 0.2010)
@@ -33,6 +33,24 @@ class CIFAR10Transform(object):
         else:
             self.transform = T.Compose([T.ToTensor(),
                                         T.Normalize(mu,std)])
+            
+    def __call__(self, sample: Image) -> Tensor:
+        x = self.transform(sample)
+        return x
+    
+class MNISTTransform(object):
+    def __init__(self, split: str) -> None:
+        self.transform = T.Compose([T.ToTensor(),
+                                    T.Normalize((0.1307,), (0.3081,))])
+            
+    def __call__(self, sample: Image) -> Tensor:
+        x = self.transform(sample)
+        return x
+    
+class FashionMNISTTransform(object):
+    def __init__(self, split: str) -> None:
+        self.transform = T.Compose([T.ToTensor(),
+                                    T.Normalize((0.5,), (0.5,))])
             
     def __call__(self, sample: Image) -> Tensor:
         x = self.transform(sample)
@@ -103,7 +121,7 @@ class CELEBA(Dataset):
     def __len__(self) -> int:
         return len(self.im_filenames)
     
-    def __getitem__(self, idx: int) -> Batch:
+    def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor]:
         im_filename = self.im_filenames[idx]
         im_path = os.path.join(self.root, "img_align_celeba", im_filename)
         im = Image.open(im_path)
@@ -112,12 +130,8 @@ class CELEBA(Dataset):
         if self.transform:
             im = self.transform(im)
 
-        return Batch(images=im, labels=torch.tensor(self.targets[idx]))
-    
-    def collate_fn(self, batch: List[Batch]) -> Batch:
-        labels = torch.stack([b.labels for b in batch], dim=0)
-        images = torch.stack([b.images for b in batch], dim=0)
-        return Batch(images=images, labels=labels)
+        return im, torch.tensor(self.targets[idx])
+
 
 
 def get_weighted_sampler(targets : List[List]):
@@ -134,10 +148,15 @@ def get_weighted_sampler(targets : List[List]):
 
 
 class MintermSampler():
-    def __init__(self, targets: List[List[int]], batch_size: int) -> None:
+    def __init__(
+            self,
+            targets: List[List[int]],
+            batch_size: int,
+            n_literals: int,
+            n_minterms_per_batch: Optional[int] = None) -> None:
         self._batch_size = batch_size
         self._n_samples = len(targets)
-        self._n_literals = len(targets[0])
+        self._n_literals = n_literals
         self._targets = np.array(targets)
 
         self._n_batches = self._n_samples // self._batch_size
@@ -153,23 +172,32 @@ class MintermSampler():
         for m in range(self._n_minterms):
             self._minterm2idx.append(np.where(self._minterm_labels == m)[0])
 
+        if n_minterms_per_batch is None:
+            self._n_minterms_per_batch = self._n_literals
+        else:
+            self._n_minterms_per_batch = n_minterms_per_batch
+
     def __iter__(self):        
         for _ in range(self._n_batches):
             sel = np.random.choice(
                 np.arange(self._n_minterms),
-                self._n_literals,
+                self._n_minterms_per_batch,
                 replace=False
             )
             batch = []
             for minterm_label in sel:
                 batch.append(np.random.choice(self._minterm2idx[minterm_label],
-                                              self._batch_size // self._n_literals))
+                                              self._batch_size // self._n_minterms_per_batch))
             batch = np.concatenate(batch)
             yield (batch)
 
     def __len__(self) -> int:
         return self._n_batches
 
+def collate_fn(batch) -> Batch:
+    labels = torch.stack([b[1] for b in batch], dim=0)
+    images = torch.stack([b[0] for b in batch], dim=0)
+    return Batch(images=images, labels=labels)
 
 def get_loader(
     dataset,
@@ -184,15 +212,55 @@ def get_loader(
     dataset = dataset.upper()
 
     cifar10_root = "/mnt/localdisk/gabriel/nodocker/CIFAR10"
+    cifar100_root = "/mnt/localdisk/gabriel/nodocker/CIFAR100"
     celeb_a_root = "/mnt/localdisk/gabriel/nodocker/CELEBA"
+    mnist_root = "/mnt/localdisk/gabriel/nodocker/MNIST"
+    fashionmnist_root = "/mnt/localdisk/gabriel/nodocker/FashionMNIST"
 
-    if dataset == "CIFAR10":
+    print(dataset)
+    if dataset == "MNIST":
+        dataset = MNIST(
+            root=mnist_root,
+            train=(split == "train"),
+            download=True,
+            target_transform=lambda i : F.one_hot(torch.tensor(i), num_classes=10),
+            transform=MNISTTransform(split))
+
+        dataloader = DataLoader(
+            dataset,
+            batch_size=batch_size,
+            shuffle=(split == "train"),
+            pin_memory=pin_memory,
+            num_workers=num_workers,
+            persistent_workers=persistent_workers,
+            collate_fn=collate_fn,
+        )
+
+    elif dataset == "FASHIONMNIST":
+        dataset = FashionMNIST(
+            root=fashionmnist_root,
+            train=(split == "train"),
+            download=True,
+            target_transform=lambda i : F.one_hot(torch.tensor(i), num_classes=10),
+            transform=FashionMNISTTransform(split)
+        )
+        dataloader = DataLoader(
+            dataset,
+            batch_size=batch_size,
+            shuffle=(split == "train"),
+            pin_memory=pin_memory,
+            num_workers=num_workers,
+            persistent_workers=persistent_workers,
+            collate_fn=collate_fn,
+        )
+
+    elif dataset == "CIFAR10":
         dataset = CIFAR10(
             root=cifar10_root,
             train=(split == "train"),
             download=True,
-            target_transform=lambda idx : F.one_hot(torch.tensor(idx), num_classes=10),
-            transform=CIFAR10Transform(split),
+            target_transform=lambda i : F.one_hot(torch.tensor(i), num_classes=10),
+            transform=CIFARTransform(split),
         )
 
         dataloader = DataLoader(
@@ -202,9 +270,41 @@ def get_loader(
             pin_memory=pin_memory,
             num_workers=num_workers,
             persistent_workers=persistent_workers,
+            collate_fn=collate_fn,
         )
-            
-    if dataset == "CELEBA":
+
+    elif dataset == "CIFAR100":
+        dataset = CIFAR100(
+            root=cifar100_root,
+            train=(split == "train"),
+            download=True,
+            target_transform=lambda i : F.one_hot(torch.tensor(i), num_classes=100),
+            transform=CIFARTransform(split),
+        )
+
+        if split == "train":
+            dataloader = DataLoader(
+                dataset,
+                #batch_size=batch_size,
+                #shuffle=(split == "train"),
+                batch_sampler=MintermSampler(dataset.targets, batch_size, 100, 50),
+                pin_memory=pin_memory,
+                num_workers=num_workers,
+                persistent_workers=persistent_workers,
+                collate_fn=collate_fn,
+            )
+        else:
+            dataloader = DataLoader(
+                dataset,
+                batch_size=batch_size,
+                shuffle=False,
+                pin_memory=pin_memory,
+                num_workers=num_workers,
+                persistent_workers=persistent_workers,
+                collate_fn=collate_fn,
+            )
+
+    elif dataset == "CELEBA":
         dataset = CELEBA(
             root=celeb_a_root,
             class_select=["Bald",
@@ -219,11 +319,11 @@ def get_loader(
         if split == "train":
             dataloader = DataLoader(
                 dataset,
-                batch_sampler=MintermSampler(dataset.targets, batch_size),
+                batch_sampler=MintermSampler(dataset.targets, batch_size, 5, 5),
                 pin_memory=pin_memory,
                 num_workers=num_workers,
                 persistent_workers=persistent_workers,
-                collate_fn=dataset.collate_fn,
+                collate_fn=collate_fn,
             )
         else:
             dataloader = DataLoader(
@@ -233,7 +333,9 @@ def get_loader(
                 pin_memory=pin_memory,
                 num_workers=num_workers,
                 persistent_workers=persistent_workers,
-                collate_fn=dataset.collate_fn,
+                collate_fn=collate_fn,
             )   
+    else:
+        raise ValueError(f"Unkown dataset {dataset}")
             
     return dataloader
