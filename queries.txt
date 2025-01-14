@@ -1,0 +1,242 @@
+not Bald - a person that is not bald
+Bald - a bald person
+not Eyeglasses - a person without eyeglasses
+Eyeglasses - a person with eyeglasses
+not Wearing_Necktie - a person not wearing a necktie
+Wearing_Necktie - a person wearing a necktie
+not Wearing_Hat - a person not wearing a hat
+Wearing_Hat - a person wearing a hat
+not Male - a person that is not male
+Male - a male person
+not Bald and not Eyeglasses - a person that is not bald and without eyeglasses
+not Bald and Eyeglasses - a person that is not bald with eyeglasses
+Bald and not Eyeglasses - a bald person without eyeglasses
+Bald and Eyeglasses - a bald person with eyeglasses
+not Bald and not Wearing_Necktie - a person that is not bald and that is not wearing a necktie
+not Bald and Wearing_Necktie - a person that is not bald, wearing a necktie
+Bald and not Wearing_Necktie - a bald person not wearing a necktie
+Bald and Wearing_Necktie - a bald person wearing a necktie
+not Bald and not Wearing_Hat - a person that is not bald, not wearing a hat
+not Bald and Wearing_Hat - a person that is not bald wearing a hat
+Bald and not Wearing_Hat - a bald person not wearing a hat
+Bald and Wearing_Hat - a bald person wearing a hat
+not Bald and not Male - a person that is not bald and not male
+not Bald and Male - a male person that is not bald
+Bald and not Male - a person that is bald and not a male
+Bald and Male - a bald male person
+not Eyeglasses and not Wearing_Necktie - a person without eyeglasses and not wearing a necktie
+not Eyeglasses and Wearing_Necktie - a person without eyeglasses wearing a necktie
+Eyeglasses and not Wearing_Necktie - a person with eyeglasses not wearing a necktie
+Eyeglasses and Wearing_Necktie - a person with eyeglasses wearing a necktie
+not Eyeglasses and not Wearing_Hat - a person without eyeglasses not wearing a hat
+not Eyeglasses and Wearing_Hat - a person without eyeglasses and wearing a hat
+Eyeglasses and not Wearing_Hat - a person with eyeglasses and not wearing a hat
+Eyeglasses and Wearing_Hat - a person with eyeglasses and wearing a hat
+not Eyeglasses and not Male - a person without eyeglasses that is not a male
+not Eyeglasses and Male - a male person without eyeglasses
+Eyeglasses and not Male - a person with eyeglasses that is not male
+Eyeglasses and Male - a male person with eyeglasses
+not Wearing_Necktie and not Wearing_Hat - a person not wearing a necktie and not wearing a hat
+not Wearing_Necktie and Wearing_Hat - a person wearing a hat and not wearing a necktie
+Wearing_Necktie and not Wearing_Hat - a person wearing a necktie and not wearing a hat
+Wearing_Necktie and Wearing_Hat - a person wearing a necktie and wearing a hat
+not Wearing_Necktie and not Male - a person not wearing a necktie that is not male 
+not Wearing_Necktie and Male - a male person not wearing a necktie
+Wearing_Necktie and not Male - a person wearing a necktie that is not male
+Wearing_Necktie and Male - a male person wearing a necktie
+not Wearing_Hat and not Male - a person that is not male, not wearing a hat
+not Wearing_Hat and Male - a male person not wearing a hat
+Wearing_Hat and not Male - a person wearing a hat that is not male
+Wearing_Hat and Male - a male person wearing a hat
+not Bald and not Eyeglasses and not Wearing_Necktie - a person that is not bald, not wearing eyeglasses and not wearing a necktie
+not Bald and not Eyeglasses and Wearing_Necktie - a person that is not bald, wearing a necktie and not wearing eyeglasses
+not Bald and Eyeglasses and not Wearing_Necktie - a person that is not bald, wearing eyeglasses and not wearing a necktie
+not Bald and Eyeglasses and Wearing_Necktie - a person that is not bald, wearing eyeglasses and wearing a necktie
+Bald and not Eyeglasses and not Wearing_Necktie - a bald person without eyeglasses and not wearing a necktie
+Bald and not Eyeglasses and Wearing_Necktie - a bald person without eyeglasses and wearing a necktie
+Bald and Eyeglasses and not Wearing_Necktie - a bald person with eyeglasses and not wearing a nectkie
+Bald and Eyeglasses and Wearing_Necktie - a bald person with eyeglasses and wearing a necktie
+not Bald and not Eyeglasses and not Wearing_Hat - a person that is not bald, without eyeglasses and not wearing a hat
+not Bald and not Eyeglasses and Wearing_Hat - a person that is not bald, without eyeglasses and wearing a hat
+not Bald and Eyeglasses and not Wearing_Hat - a person that is not bald, with eyeglasses and not wearing a hat
+not Bald and Eyeglasses and Wearing_Hat -  a person that is not bald, with eyeglasses and wearing a hat
+Bald and not Eyeglasses and not Wearing_Hat - a bald person without eyeglasses and not wearing a hat
+Bald and not Eyeglasses and Wearing_Hat - a bald person without eyeglasses and wearing a hat
+Bald and Eyeglasses and not Wearing_Hat - a bald person with eyeglasses and not wearing a hat
+Bald and Eyeglasses and Wearing_Hat - a bald person with eyeglasses and wearing a hat
+not Bald and not Eyeglasses and not Male - a person that is not bald, is not a male and without eyeglasses
+not Bald and not Eyeglasses and Male - a male person that is not bald without eyeglasses
+not Bald and Eyeglasses and not Male - a person that is not bald and not male, with eyeglasses
+not Bald and Eyeglasses and Male - a male person that is not bald with eyeglasses
+Bald and not Eyeglasses and not Male - a bald person that is not male, without eyeglasses
+Bald and not Eyeglasses and Male - a bald male without eyeglasses
+Bald and Eyeglasses and not Male - a bald person with eyeglasses that is not male
+Bald and Eyeglasses and Male - a bald male person with eyeglasses
+not Bald and not Wearing_Necktie and not Wearing_Hat - a person that is not bald, not wearing a necktie and not wearing a hat
+not Bald and not Wearing_Necktie and Wearing_Hat - a person that is not bald, not wearing a necktie and not wearing a hat
+not Bald and Wearing_Necktie and not Wearing_Hat - a person that is not bald, wearing a necktie and not wearing a hat
+not Bald and Wearing_Necktie and Wearing_Hat - a person that is not bald, wearing a necktie and not wearing a hat
+Bald and not Wearing_Necktie and not Wearing_Hat - a bald person not wearing a necktie and not wearing a hat
+Bald and not Wearing_Necktie and Wearing_Hat - a bald person not wearing a necktie and no wearing a hat
+Bald and Wearing_Necktie and not Wearing_Hat - a bald person wearing a necktie and not wearing a hat
+Bald and Wearing_Necktie and Wearing_Hat - a bald person wearing a necktie and wearing a hat
+not Bald and not Wearing_Necktie and not Male - a male person that is not bald and not wearing a necktie
+not Bald and not Wearing_Necktie and Male - a male person that is not bald and not wearing a necktie
+not Bald and Wearing_Necktie and not Male - a person that is not male and not bald wearing a necktie
+not Bald and Wearing_Necktie and Male - a male person that is not bald wearing a necktie
+Bald and not Wearing_Necktie and not Male - a bald person that is not male not wearing a necktie
+Bald and not Wearing_Necktie and Male - a bald male person not wearing a necktie
+Bald and Wearing_Necktie and not Male - a bald person that is not male wearing a necktie
+Bald and Wearing_Necktie and Male - a bald male person wearing a necktie
+not Bald and not Wearing_Hat and not Male - a person that is not male and not bald, not wearing a hat
+not Bald and not Wearing_Hat and Male - a male person that is not bald not wearing a hat
+not Bald and Wearing_Hat and not Male - a person that is not male and not bald, wearing a hat
+not Bald and Wearing_Hat and Male - a male person that is not bald wearing a hat
+Bald and not Wearing_Hat and not Male - a bald person that is not male, not wearing a hat
+Bald and not Wearing_Hat and Male - a bald male person not wearing a hat
+Bald and Wearing_Hat and not Male - a person that is bald and not male, wearing a hat
+Bald and Wearing_Hat and Male - a bald male person wearing a hat
+not Eyeglasses and not Wearing_Necktie and not Wearing_Hat - a person without eyeglasses, not wearing a necktie and not wearing a hat
+not Eyeglasses and not Wearing_Necktie and Wearing_Hat - a person without eyeglasses, not wearing a necktie and wearing a hat
+not Eyeglasses and Wearing_Necktie and not Wearing_Hat - a person without eyeglasses wearing a necktie and not wearing a hat
+not Eyeglasses and Wearing_Necktie and Wearing_Hat - a person without eyeglasses wearing a necktie and wearing a hat
+Eyeglasses and not Wearing_Necktie and not Wearing_Hat - a person with eyeglasses not wearing a necktie and not wearing a hat
+Eyeglasses and not Wearing_Necktie and Wearing_Hat - a person with eyeglasses wearing a necktie and not wearing a hat
+Eyeglasses and Wearing_Necktie and not Wearing_Hat - a person with eyeglasses wearing a necktie and not wearing a hat
+Eyeglasses and Wearing_Necktie and Wearing_Hat - a person with eyeglasses wearing a necktie and wearing a hat
+not Eyeglasses and not Wearing_Necktie and not Male - a person that is not a male, without eyeglasses and not wearing a necktie
+not Eyeglasses and not Wearing_Necktie and Male - a male person without eyeglasses and not wearing a necktie
+not Eyeglasses and Wearing_Necktie and not Male - a person that is not male, without eyeglasses and wearing a neckie
+not Eyeglasses and Wearing_Necktie and Male - a male person without eyeglasses wearing a necktie
+Eyeglasses and not Wearing_Necktie and not Male - a person that is not a male, with eyeglasses and not wearing a necktie
+Eyeglasses and not Wearing_Necktie and Male - a male person with eyeglasses not wearing a necktie
+Eyeglasses and Wearing_Necktie and not Male - a person that is not a male, with eyeglasses and wearing a necktie
+Eyeglasses and Wearing_Necktie and Male - a male person with eyeglasses and wearing a necktie
+not Eyeglasses and not Wearing_Hat and not Male - a person that is not a male without eyeglasses and not wearing a hat
+not Eyeglasses and not Wearing_Hat and Male - a male person without eyeglasses and not wearing a hat
+not Eyeglasses and Wearing_Hat and not Male - a person that is not a male, without eyeglasses and wearing a hat
+not Eyeglasses and Wearing_Hat and Male - a male person without eyeglasses and wearing a hat
+Eyeglasses and not Wearing_Hat and not Male - a person that is not a male, with  eyeglasses and not wearing a hat
+Eyeglasses and not Wearing_Hat and Male - a male person with eyeglasses and not wearing a hat
+Eyeglasses and Wearing_Hat and not Male - a person that is not a male, with eyeglasses and wearing a hat
+Eyeglasses and Wearing_Hat and Male - a male person with eyeglasses and wearing a hat
+not Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, not wearing a necktie and not wearing a hat
+not Wearing_Necktie and not Wearing_Hat and Male - a male person not wearing a necktie and not wearing a hat
+not Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, not wearing a neckyie and wearing a hat
+not Wearing_Necktie and Wearing_Hat and Male - a male person, not wearing a neckyie and wearing a hat
+Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, wearing a necktie and not wearing a hat
+Wearing_Necktie and not Wearing_Hat and Male - a male person wearing a necktie and not wearing a hat
+Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, wearing a necktie and wearing a hat
+Wearing_Necktie and Wearing_Hat and Male - a male person wearing a necktie and wearing a hat
+not Bald and not Eyeglasses and not Wearing_Necktie and not Wearing_Hat - a person that is not bald without eyeglasses, not wearing a hat and not wearing a necktie
+not Bald and not Eyeglasses and not Wearing_Necktie and Wearing_Hat - a person that is not bald without eyeglasses, wearing a hat and not wearing a necktie
+not Bald and not Eyeglasses and Wearing_Necktie and not Wearing_Hat - a person that is not bald without eyeglasses, wearing a necktie and not wearing a hat
+not Bald and not Eyeglasses and Wearing_Necktie and Wearing_Hat - a person that is not bald without eyeglasses, wearing a hat and wearing a necktie
+not Bald and Eyeglasses and not Wearing_Necktie and not Wearing_Hat - a person that is not bald with eyeglasses, wearing a hat and not wearing a necktie
+not Bald and Eyeglasses and not Wearing_Necktie and Wearing_Hat - a person that is not bald with eyeglasses, wearing a hat and not wearing a necktie
+not Bald and Eyeglasses and Wearing_Necktie and not Wearing_Hat - a person that is not bald with eyeglasses, wearing a necktie and not wearing a hat
+not Bald and Eyeglasses and Wearing_Necktie and Wearing_Hat - a person that is not bald with eyeglasses, wearing a necktie and wearing a hat
+Bald and not Eyeglasses and not Wearing_Necktie and not Wearing_Hat - a bald person without eyeglasses not wearing a hat and not wearing a necktie
+Bald and not Eyeglasses and not Wearing_Necktie and Wearing_Hat - a bald person without eyeglasses wearing a hat and not wearing a necktie
+Bald and not Eyeglasses and Wearing_Necktie and not Wearing_Hat - a bald person without eyeglasses wearing a necktie and not wearing a hat
+Bald and not Eyeglasses and Wearing_Necktie and Wearing_Hat - a bald person without eyeglasses wearing a hat and wearing a necktie
+Bald and Eyeglasses and not Wearing_Necktie and not Wearing_Hat - a bald person with eyeglasses wearing a hat and not wearing a necktie
+Bald and Eyeglasses and not Wearing_Necktie and Wearing_Hat - a bald person with eyeglasses wearing a hat and not wearing a necktie
+Bald and Eyeglasses and Wearing_Necktie and not Wearing_Hat - a bald person with eyeglasses wearing a necktie and not wearing a hat
+Bald and Eyeglasses and Wearing_Necktie and Wearing_Hat - a bald person with eyeglasses wearing a necktie and wearing a hat
+not Bald and not Eyeglasses and not Wearing_Necktie and not Male - a person that is not a male and not bald, without eyeglasses and not wearing a necktie
+not Bald and not Eyeglasses and not Wearing_Necktie and Male - a male person that is not bald, without eyeglasses and not wearing a necktie
+not Bald and not Eyeglasses and Wearing_Necktie and not Male - a person that is not a male and not bald, without eyeglasses and wearing a necktie
+not Bald and not Eyeglasses and Wearing_Necktie and Male - a male person that is not bald, without eyeglasses and wearing a necktie
+not Bald and Eyeglasses and not Wearing_Necktie and not Male - a person that is not a male and not bald, with eyeglasses and not wearing a necktie
+not Bald and Eyeglasses and not Wearing_Necktie and Male - a male person that is not bald, with eyeglasses and not wearing a necktie
+not Bald and Eyeglasses and Wearing_Necktie and not Male - a person that is not a male and not bald, with eyeglasses and wearing a necktie
+not Bald and Eyeglasses and Wearing_Necktie and Male - a male person that is not bald, with eyeglasses and wearing a necktie
+Bald and not Eyeglasses and not Wearing_Necktie and not Male - a bald person that is not a male, without eyeglasses and not wearing a necktie
+Bald and not Eyeglasses and not Wearing_Necktie and Male - a bald male person without eyeglasses and not wearing a necktie
+Bald and not Eyeglasses and Wearing_Necktie and not Male - a bald person that is not a male, without eyeglasses and wearing a necktie
+Bald and not Eyeglasses and Wearing_Necktie and Male - a bald male person without eyeglasses and wearing a necktie
+Bald and Eyeglasses and not Wearing_Necktie and not Male - a bald person that is not a male, with eyeglasses and not wearing a necktie
+Bald and Eyeglasses and not Wearing_Necktie and Male - a bald male person with eyeglasses and not wearing a necktie
+Bald and Eyeglasses and Wearing_Necktie and not Male - a bald person that is not a male, with eyeglasses and wearing a necktie
+Bald and Eyeglasses and Wearing_Necktie and Male - a bald male person with eyeglasses and wearing a necktie
+not Bald and not Eyeglasses and not Wearing_Hat and not Male - a person that is not a male and not bald, without eyeglasses and not wearing a hat
+not Bald and not Eyeglasses and not Wearing_Hat and Male - a male person that is not bald, without eyeglasses and not wearing a hat
+not Bald and not Eyeglasses and Wearing_Hat and not Male - a person that is not a male and not bald, without eyeglasses and wearing a hat
+not Bald and not Eyeglasses and Wearing_Hat and Male - a male person that is not bald, without eyeglasses and wearing a hat
+not Bald and Eyeglasses and not Wearing_Hat and not Male - a person that is not a male and not bald, with eyeglasses and not wearing a hat
+not Bald and Eyeglasses and not Wearing_Hat and Male - a male person that is not bald, with eyeglasses and not wearing a hat
+not Bald and Eyeglasses and Wearing_Hat and not Male - a person that is not a male and not bald, with eyeglasses and wearing a hat
+not Bald and Eyeglasses and Wearing_Hat and Male - a male person that is not bald, with eyeglasses and wearing a hat
+Bald and not Eyeglasses and not Wearing_Hat and not Male - a bald person that is not a male, without eyeglasses and not wearing a hat
+Bald and not Eyeglasses and not Wearing_Hat and Male - a bald male person without eyeglasses and not wearing a hat
+Bald and not Eyeglasses and Wearing_Hat and not Male - a bald person that is not a male, without eyeglasses and wearing a hat
+Bald and not Eyeglasses and Wearing_Hat and Male - a bald male person without eyeglasses and wearing a hat
+Bald and Eyeglasses and not Wearing_Hat and not Male - a bald person that is not a male, with eyeglasses and not wearing a hat
+Bald and Eyeglasses and not Wearing_Hat and Male - a bald male person with eyeglasses and not wearing a hat
+Bald and Eyeglasses and Wearing_Hat and not Male - a bald person that is not a male, with eyeglasses and wearing a hat
+Bald and Eyeglasses and Wearing_Hat and Male - a bald male person with eyeglasses and wearing a hat
+not Bald and not Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male and not bald, not wearing a hat and not wearing a necktie
+not Bald and not Wearing_Necktie and not Wearing_Hat and Male - a male person that is not bald, not wearing a hat and not wearing a necktie
+not Bald and not Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male and not bald, wearing a hat and not wearing a necktie
+not Bald and not Wearing_Necktie and Wearing_Hat and Male - a male person that is not bald, wearing a hat and not wearing a necktie
+not Bald and Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male and not bald, wearing a necktie and not wearing a hat
+not Bald and Wearing_Necktie and not Wearing_Hat and Male - a male person that is not bald, wearing a necktie and not wearing a hat
+not Bald and Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male and not bald, wearing a necktie and wearing a hat
+not Bald and Wearing_Necktie and Wearing_Hat and Male - a male person that is not bald, wearing a necktie and wearing a hat
+Bald and not Wearing_Necktie and not Wearing_Hat and not Male - a bald person that is not a male, not wearing a hat and not wearing a necktie
+Bald and not Wearing_Necktie and not Wearing_Hat and Male - a bald male person not wearing a hat and not wearing a necktie
+Bald and not Wearing_Necktie and Wearing_Hat and not Male - a bald person that is not a male, wearing a hat and not wearing a necktie
+Bald and not Wearing_Necktie and Wearing_Hat and Male - a bald male person wearing a hat and not wearing a necktie
+Bald and Wearing_Necktie and not Wearing_Hat and not Male - a bald person that is not a male, wearing a necktie and not wearing a hat
+Bald and Wearing_Necktie and not Wearing_Hat and Male - a bald male person wearing a necktie and not wearing a hat
+Bald and Wearing_Necktie and Wearing_Hat and not Male - a bald person that is not a male, wearing a necktie and wearing a hat
+Bald and Wearing_Necktie and Wearing_Hat and Male - a bald male person wearing a necktie and wearing a hat
+not Eyeglasses and not Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, without eyeglasses, not wearing a hat and not wearing a necktie
+not Eyeglasses and not Wearing_Necktie and not Wearing_Hat and Male - a male person without eyeglasses, not wearing a hat and not wearing a necktie
+not Eyeglasses and not Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, without eyeglasses, wearing a hat and not wearing a necktie
+not Eyeglasses and not Wearing_Necktie and Wearing_Hat and Male - a male person without eyeglasses, wearing a hat and not wearing a necktie
+not Eyeglasses and Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, without eyeglasses, wearing a necktie and not wearing a hat
+not Eyeglasses and Wearing_Necktie and not Wearing_Hat and Male - a male person without eyeglasses, wearing a necktie and not wearing a hat
+not Eyeglasses and Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, without eyeglasses, wearing a hat and wearing a necktie
+not Eyeglasses and Wearing_Necktie and Wearing_Hat and Male - a male person without eyeglasses, wearing a hat and wearing a necktie
+Eyeglasses and not Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, with eyeglasses, not wearing a hat and not wearing a necktie
+Eyeglasses and not Wearing_Necktie and not Wearing_Hat and Male - a male person with eyeglasses, not wearing a hat and not wearing a necktie
+Eyeglasses and not Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, with eyeglasses, wearing a hat and not wearing a necktie
+Eyeglasses and not Wearing_Necktie and Wearing_Hat and Male - a male person with eyeglasses, wearing a hat and not wearing a necktie
+Eyeglasses and Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, with eyeglasses, wearing a necktie and not wearing a hat
+Eyeglasses and Wearing_Necktie and not Wearing_Hat and Male - a male person with eyeglasses, wearing a necktie and not wearing a hat
+Eyeglasses and Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, with eyeglasses, wearing a necktie and wearing a hat
+Eyeglasses and Wearing_Necktie and Wearing_Hat and Male - a male person with eyeglasses, wearing a necktie and wearing a hat
+not Bald and not Eyeglasses and not Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, not bald, without eyeglasses, not wearing a hat and not wearing a necktie
+not Bald and not Eyeglasses and not Wearing_Necktie and not Wearing_Hat and Male - a male person that is not bald, without eyeglasses, not wearing a hat and not wearing a necktie
+not Bald and not Eyeglasses and not Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, not bald, without eyeglasses, wearing a hat and not wearing a necktie
+not Bald and not Eyeglasses and not Wearing_Necktie and Wearing_Hat and Male - a male person that is not bald, without eyeglasses, wearing a hat and not wearing a necktie
+not Bald and not Eyeglasses and Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, not bald, without eyeglasses, wearing a necktie and not wearing a hat
+not Bald and not Eyeglasses and Wearing_Necktie and not Wearing_Hat and Male - a male person that is not bald, without eyeglasses, wearing a necktie and not wearing a hat
+not Bald and not Eyeglasses and Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, not bald, without eyeglasses, wearing a hat and wearing a necktie
+not Bald and not Eyeglasses and Wearing_Necktie and Wearing_Hat and Male - a male person that is not bald, without eyeglasses, wearing a hat and wearing a necktie
+not Bald and Eyeglasses and not Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, not bald, with eyeglasses, not wearing a hat and not wearing a necktie
+not Bald and Eyeglasses and not Wearing_Necktie and not Wearing_Hat and Male - a male person that is not bald, with eyeglasses, not wearing a hat and not wearing a necktie
+not Bald and Eyeglasses and not Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, not bald, with eyeglasses, wearing a hat and not wearing a necktie
+not Bald and Eyeglasses and not Wearing_Necktie and Wearing_Hat and Male - a male person that is not bald, with eyeglasses, wearing a hat and not wearing a necktie
+not Bald and Eyeglasses and Wearing_Necktie and not Wearing_Hat and not Male - a person that is not a male, not bald, with eyeglasses, wearing a neckie and not wearing a hat
+not Bald and Eyeglasses and Wearing_Necktie and not Wearing_Hat and Male - a male person that is not bald, with eyeglasses, wearing a neckie and not wearing a hat
+not Bald and Eyeglasses and Wearing_Necktie and Wearing_Hat and not Male - a person that is not a male, not bald, with eyeglasses, wearing a neckie and wearing a hat
+not Bald and Eyeglasses and Wearing_Necktie and Wearing_Hat and Male - a male person that is not bald, with eyeglasses, wearing a neckie and wearing a hat
+Bald and not Eyeglasses and not Wearing_Necktie and not Wearing_Hat and not Male - a bald person that is not a male, without eyeglasses, not wearing a hat and not wearing a necktie
+Bald and not Eyeglasses and not Wearing_Necktie and not Wearing_Hat and Male - a bald male person, without eyeglasses, not wearing a hat and not wearing a necktie
+Bald and not Eyeglasses and not Wearing_Necktie and Wearing_Hat and not Male - a bald person that is not a male, without eyeglasses, wearing a hat and not wearing a necktie
+Bald and not Eyeglasses and not Wearing_Necktie and Wearing_Hat and Male - a bald male person, without eyeglasses, wearing a hat and not wearing a necktie
+Bald and not Eyeglasses and Wearing_Necktie and not Wearing_Hat and not Male - a bald person that is not a male, without eyeglasses, wearing a neckie and not wearing a hat
+Bald and not Eyeglasses and Wearing_Necktie and not Wearing_Hat and Male - a bald male person, without eyeglasses, wearing a neckie and not wearing a hat
+Bald and not Eyeglasses and Wearing_Necktie and Wearing_Hat and not Male - a bald person that is not male, without eyeglasses, wearing a neckie and wearing a hat
+Bald and not Eyeglasses and Wearing_Necktie and Wearing_Hat and Male - a bald male person without eyeglasses wearing a neckie and wearing a hat
+Bald and Eyeglasses and not Wearing_Necktie and not Wearing_Hat and not Male - a bald person that is not male, with eyeglasses, not wearing a neckie and not wearing a hat
+Bald and Eyeglasses and not Wearing_Necktie and not Wearing_Hat and Male - a bald male person with eyeglasses, not wearing a neckie and not wearing a hat
+Bald and Eyeglasses and not Wearing_Necktie and Wearing_Hat and not Male - a bald person that is not a male, with eyeglasses, wearing a hat and not wearing a necktie
+Bald and Eyeglasses and not Wearing_Necktie and Wearing_Hat and Male - a bald male person with eyeglasses, wearing a hat and not wearing a necktie
+Bald and Eyeglasses and Wearing_Necktie and not Wearing_Hat and not Male - a bald person that is not a male, with eyeglasses, wearing a neckie and not wearing a hat
+Bald and Eyeglasses and Wearing_Necktie and not Wearing_Hat and Male - a bald male person with eyeglasses, wearing a neckie and not wearing a hat
+Bald and Eyeglasses and Wearing_Necktie and Wearing_Hat and not Male - a bald person that is not a male, with eyeglasses, wearing a neckie and wearing a hat
+Bald and Eyeglasses and Wearing_Necktie and Wearing_Hat and Male - a bald male person with eyeglasses, wearing a neckie and wearing a hat
