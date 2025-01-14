@@ -8,7 +8,7 @@ from resnet import *
 from convnet import ConvNet
 from dataset import Batch
 
-from typing import Dict, Union, Tuple, Callable, Optional
+from typing import Dict, Union, Tuple, Callable
 
 import logging
 
@@ -39,18 +39,40 @@ class Model(nn.Module):
                 out_dim=dim_out + int(kernel != "linear"),
                 activation=activation
             )
+
         elif backbone == "resnet34":
             self._backbone = resnet34(
                 in_dim=dim_in,
                 out_dim=dim_out + int(kernel != "linear"),
                 activation=activation
             )
+
+        elif backbone == "Resnet18":
+            self._backbone = torch.hub.load(
+                'pytorch/vision:v0.10.0',
+                'resnet18',
+                pretrained=True)
+            self._backbone.fc = nn.Linear(512, dim_out + int(kernel != "linear"),)
+            nn.init.kaiming_normal(self._backbone.fc.weight.data)
+
+        elif backbone == "Resnet50":
+            self._backbone = torch.hub.load(
+                'pytorch/vision:v0.10.0',
+                'resnet18',
+                pretrained=True)
+            self._backbone.fc = nn.Linear(2048, dim_out + int(kernel != "linear"),)
+            nn.init.kaiming_normal(self._backbone.fc.weight.data)
+
         elif backbone == "convnet":
             self._backbone = ConvNet(
                 in_dim=dim_in,
                 out_dim=dim_out + int(kernel != "linear"),
                 activation=activation
             )
+
+        elif backbone in ('dinov2_vits14_reg'):
+            self._backbone = torch.hub.load('facebookresearch/dinov2', backbone)
+
         else:
             raise ValueError(f"Unknown backbone {backbone}")
 
@@ -73,7 +95,12 @@ class Model(nn.Module):
         self._memory_y.append(data.labels.cpu())
 
     def embed(self, data: Batch) -> Tensor:
-        feat = self._backbone(data.images)
+        if "dinov2" in str(type(self._backbone)):
+            out = self._backbone.forward_features(data.images)
+            feat = out["x_prenorm"][:,0]
+        else:
+            feat = self._backbone(data.images)
+
         if self._kernel == "linear":
             return feat, None
         else:
@@ -131,10 +158,14 @@ class Model(nn.Module):
             
             if self._kernel == "linear":
                 minterm_samples = F.normalize(minterm_samples, dim=-1, p=2)
-                U, _, _ = svd(minterm_samples.T)
-                self._minterm_evecs.append(U[:,:1].T)
-                self._minterms.append(minterm)
-                self._minterm_samples.append(minterm_samples)
+                try:
+                    U, _, _ = svd(minterm_samples.T)
+                except:
+                    logging.error(f"svd error minterm {minterm}")
+                else:
+                    self._minterms.append(minterm)
+                    self._minterm_evecs.append(U[:,:1].T)
+                    self._minterm_samples.append(minterm_samples)
             else:
                 K = self.kernel(minterm_samples, minterm_samples)
                 try:
@@ -149,12 +180,11 @@ class Model(nn.Module):
                     self._minterm_samples.append(minterm_samples)
 
     @torch.no_grad()
-    def evaluate(self, data: Batch) -> Tuple[Tensor, Tensor]:        
-        batch_size = data.images.shape[0]
-
+    def evaluate(self, data: Batch) -> Tuple[Tensor, Tensor]:    
         if self._minterms is None:
-            return torch.tensor([0]), torch.tensor([0])
-
+            return torch.tensor([0]), torch.tensor([0])    
+        
+        batch_size = data.images.shape[0]
         logging.info(f"Eval with {len(self._minterms)} minterms")
 
         # Create minterm labels (ficticious labels)
@@ -184,10 +214,18 @@ class Model(nn.Module):
                 
                 p.append(torch.square(projections).sum(-1).view(-1,1))
             p = torch.cat(p, dim=-1)
-            
-        predictions = torch.argmax(p, dim=-1)
+        
+        p = p / p.sum(-1, keepdim=True)
+        minterm_predictions = torch.argmax(p, dim=-1)
 
-        return predictions[minterm_labels > -1], minterm_labels[minterm_labels > -1]
+        label_probs = []
+        minterms = torch.stack(self._minterms, dim=0)
+        for i in range(minterms.shape[1]):
+            mask = minterms[:,i] == 1
+            label_probs.append(p[:,mask].sum(-1))
+        label_probs = torch.stack(label_probs, dim=-1)
+
+        return minterm_predictions[minterm_labels > -1], minterm_labels[minterm_labels > -1], label_probs
 
 
 def compute_target_sigma(y_svals,

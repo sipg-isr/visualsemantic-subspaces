@@ -4,16 +4,19 @@ from dataclasses import dataclass
 
 from PIL import Image
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn.functional as F
 import torchvision.transforms as T
+from torchvision.transforms import v2
 from torch import Tensor
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 from torchvision.datasets import CIFAR10, CIFAR100, MNIST, FashionMNIST
-from torch.utils.data.sampler import WeightedRandomSampler
 
-from typing import List, Optional, Tuple
+from sampler import MintermSampler
+
+from typing import List, Tuple
 
 @dataclass
 class Batch:
@@ -70,6 +73,88 @@ class CELEBATransform(object):
         x = self.transform(sample)
         return x
     
+
+class CXR14Transform(object):
+    def __init__(self, split: str, img_size: int) -> None:
+        if split.lower() == "train":
+            self.transform = T.Compose([v2.ToImage(),
+                                        v2.ToDtype(torch.uint8, scale=True),
+                                        v2.Resize(img_size),
+                                        v2.ToDtype(torch.float32, scale=True),
+                                        v2.RandomHorizontalFlip()])
+        else:
+            self.transform = T.Compose([v2.ToImage(),
+                                        v2.ToDtype(torch.uint8, scale=True),
+                                        v2.Resize(img_size),
+                                        v2.ToDtype(torch.float32, scale=True)])
+            
+    def __call__(self, sample: Image) -> Tensor:
+        x = self.transform(sample)
+        return x
+
+class CXR14(object):
+    def __init__(
+        self,
+        split: str,
+        root: str,
+        transform = None
+    ):
+        self.root = root
+        self.transform = transform
+
+        df = pd.read_csv(f"{root}/Data_Entry_2017_v2020.csv")
+
+        self.im_filenames = df["Image Index"].to_list()
+        self.labels = [labels.split("|") for labels in df["Finding Labels"].to_list()]
+
+        self.classes = np.unique([c for label_list in self.labels for c in label_list])
+        self.num_classes = len(self.classes)
+
+        self.class_to_idx = {c : i for i, c in enumerate(self.classes)}
+
+        self.im_filename_to_targets = {}
+        for i in range(len(self.im_filenames)):
+            im_filename = self.im_filenames[i]
+            label_list = self.labels[i]
+            target = torch.zeros((self.num_classes,))
+            for label in label_list:
+                idx = self.class_to_idx[label]
+                target += F.one_hot(torch.tensor(idx), self.num_classes)
+            self.im_filename_to_targets[im_filename] = target
+
+        self.targets = torch.stack(list(self.im_filename_to_targets.values()), dim=0)
+        self.targets = self.targets.to(torch.uint32).tolist()
+
+        if split.lower() == "train":
+            self.split_im_filenames = np.loadtxt(f"{root}/train_val_list.txt", dtype=np.chararray)
+            self.split_im_filenames = self.split_im_filenames[:78544]
+            self.targets = self.targets[:78544]
+        elif split.lower() == "val":
+            self.split_im_filenames = np.loadtxt(f"{root}/train_val_list.txt", dtype=np.chararray)
+            self.split_im_filenames = self.split_im_filenames[78544:]
+            self.targets = self.targets[78544:]
+        elif split.lower() == "test":
+            self.split_im_filenames = np.loadtxt(f"{root}/test_list.txt", dtype=np.chararray)
+        else:
+            raise ValueError(f"Unknown split {split}")
+        
+        self.length = len(self.split_im_filenames)
+
+    def __len__(self) -> int:
+        return self.length
+    
+    def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor]:
+        im_filename = self.split_im_filenames[idx]
+        im_path = f"{self.root}/images/{im_filename}"
+        im = Image.open(im_path).convert('L')
+
+        if self.transform:
+            im = self.transform(im)
+            im = im.repeat(3, 1, 1)
+        return im, self.im_filename_to_targets[im_filename]
+
+
+
 class CELEBA(Dataset):
     def __init__(
         self,
@@ -132,68 +217,6 @@ class CELEBA(Dataset):
 
         return im, torch.tensor(self.targets[idx])
 
-
-
-def get_weighted_sampler(targets : List[List]):
-    t = torch.tensor(targets)
-    cnf, counts = torch.unique(t, dim=0, return_counts=True)
-    weights = torch.zeros((len(targets),))
-
-    for i, clause in enumerate(cnf):
-        mask = (t == clause).all(dim=-1)
-        weights[mask] = 1.0 / counts[i]
-
-    sampler = WeightedRandomSampler(weights, len(weights)) 
-    return sampler
-
-
-class MintermSampler():
-    def __init__(
-            self,
-            targets: List[List[int]],
-            batch_size: int,
-            n_literals: int,
-            n_minterms_per_batch: Optional[int] = None) -> None:
-        self._batch_size = batch_size
-        self._n_samples = len(targets)
-        self._n_literals = n_literals
-        self._targets = np.array(targets)
-
-        self._n_batches = self._n_samples // self._batch_size
-        self._minterms, self._minterm_labels = np.unique(
-            self._targets,
-            axis=0,
-            return_inverse=True,
-        )
-
-        self._n_minterms = self._minterm_labels.max() + 1
-
-        self._minterm2idx = []
-        for m in range(self._n_minterms):
-            self._minterm2idx.append(np.where(self._minterm_labels == m)[0])
-
-        if n_minterms_per_batch is None:
-            self._n_minterms_per_batch = self._n_literals
-        else:
-            self._n_minterms_per_batch = n_minterms_per_batch
-
-    def __iter__(self):        
-        for _ in range(self._n_batches):
-            sel = np.random.choice(
-                np.arange(self._n_minterms),
-                self._n_minterms_per_batch,
-                replace=False
-            )
-            batch = []
-            for minterm_label in sel:
-                batch.append(np.random.choice(self._minterm2idx[minterm_label],
-                                              self._batch_size // self._n_minterms_per_batch))
-            batch = np.concatenate(batch)
-            yield (batch)
-
-    def __len__(self) -> int:
-        return self._n_batches
-
 def collate_fn(batch) -> Batch:
     labels = torch.stack([b[1] for b in batch], dim=0)
     images = torch.stack([b[0] for b in batch], dim=0)
@@ -216,8 +239,10 @@ def get_loader(
     celeb_a_root = "/mnt/localdisk/gabriel/nodocker/CELEBA"
     mnist_root = "/mnt/localdisk/gabriel/nodocker/MNIST"
     fashionmnist_root = "/mnt/localdisk/gabriel/nodocker/FashionMNIST"
+    cxr14_root = "/mnt/localdisk/gabriel/nodocker/CXR14"
 
     print(dataset)
+
     if dataset == "MNIST":
         dataset = MNIST(
             root=mnist_root,
@@ -285,8 +310,6 @@ def get_loader(
         if split == "train":
             dataloader = DataLoader(
                 dataset,
-                #batch_size=batch_size,
-                #shuffle=(split == "train"),
                 batch_sampler=MintermSampler(dataset.targets, batch_size, 100, 50),
                 pin_memory=pin_memory,
                 num_workers=num_workers,
@@ -334,7 +357,33 @@ def get_loader(
                 num_workers=num_workers,
                 persistent_workers=persistent_workers,
                 collate_fn=collate_fn,
-            )   
+            )
+    elif dataset == "CXR14":
+        dataset = CXR14(
+            root=cxr14_root,
+            split=split,
+            transform=CXR14Transform(split=split, img_size=img_size),
+        )
+
+        if split == "train":
+            dataloader = DataLoader(
+                dataset,
+                batch_sampler=MintermSampler(dataset.targets, batch_size, 15, 15),
+                pin_memory=pin_memory,
+                num_workers=num_workers,
+                persistent_workers=persistent_workers,
+                collate_fn=collate_fn,
+            )
+        else:
+            dataloader = DataLoader(
+                dataset,
+                batch_size=batch_size,
+                shuffle=False,
+                pin_memory=pin_memory,
+                num_workers=num_workers,
+                persistent_workers=persistent_workers,
+                collate_fn=collate_fn,
+            )
     else:
         raise ValueError(f"Unkown dataset {dataset}")
             

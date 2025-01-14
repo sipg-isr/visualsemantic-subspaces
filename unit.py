@@ -12,7 +12,7 @@ from torchtnt.framework.unit import EvalUnit, PredictUnit, TrainUnit
 from torchtnt.utils.distributed import get_global_rank
 from torchtnt.utils.device import copy_data_to_device
 from torchtnt.utils.loggers.tensorboard import TensorBoardLogger
-from torcheval.metrics import MulticlassAccuracy
+from torcheval.metrics import MulticlassAccuracy, MultilabelAUPRC
 
 from dataset import Batch
 
@@ -36,8 +36,9 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
         self._tb_logger = tb_logger
         self._cfg = cfg
 
-        self._metrics = {"multiclass_accuracy" : MulticlassAccuracy()}
-
+        self._metrics = {"multiclass_accuracy" : MulticlassAccuracy(),
+                         "multilabel_auprc" : MultilabelAUPRC(num_labels=15, average="macro")}
+        
     def tb_log_metrics(self, split: str) -> None:
         step_count = self.train_progress.num_steps_completed
         for metric_name, metric in self._metrics.items():
@@ -50,12 +51,18 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
         self._optimizer.zero_grad()
 
         data = copy_data_to_device(data, device=self._device)
-        output = self._module(data)
+
+        try:
+            output = self._module(data)
+        except:
+            logging.error("Error in forward pass")
+            return
 
         try:
             output["loss"].backward()
         except:
             logging.error("Error in backward pass")
+            return
 
         if self._cfg.train.optimizer.clip_grad_norm is not None:
             nn.utils.clip_grad_norm_(
@@ -73,8 +80,9 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
         
             self._module.eval()
             self._module.update_minterms()
-            minterm_preds, minterm_targets = self._module.evaluate(data)
+            minterm_preds, minterm_targets, label_probs = self._module.evaluate(data)
             self._metrics["multiclass_accuracy"].update(minterm_preds, minterm_targets)
+            self._metrics["multilabel_auprc"].update(label_probs, data.labels)
 
     def on_train_epoch_end(self, state: State) -> None:
         self._module.update_minterms()
@@ -98,8 +106,9 @@ class Trainer(TrainUnit[Batch], EvalUnit[Batch], PredictUnit[Batch]):
     def eval_step(self, state: State, data: Batch) -> None:
         self._module.eval()
         data = copy_data_to_device(data, self._device)
-        minterm_preds, minterm_targets = self._module.evaluate(data)
+        minterm_preds, minterm_targets, label_probs = self._module.evaluate(data)
         self._metrics["multiclass_accuracy"].update(minterm_preds, minterm_targets)
+        self._metrics["multilabel_auprc"].update(label_probs, data.labels)
 
     def on_eval_epoch_end(self, state: State) -> None:
         self.tb_log_metrics("val")
