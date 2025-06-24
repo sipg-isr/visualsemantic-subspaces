@@ -9,7 +9,7 @@ Published 2025AISTATS 2025
 Abstract:
 
 Learning image representations that capture rich semantic relationships remains a significant challenge. Existing approaches are either contrastive, lacking robust theoretical guarantees, or struggle to effectively represent the partial orders inherent to structured visual-semantic data. In this paper, we introduce a nuclear norm-based loss function, grounded in the same information theoretic principles that have proved effective in self-supervised learning. We present a theoretical characterization of this loss, demonstrating that, in addition to promoting class orthogonality, it encodes the spectral geometry of the data within a subspace lattice. This geometric representation allows us to associate logical propositions with subspaces, ensuring that our learned representations adhere to a predefined symbolic structure.
-Submission Number: 1388
+
 
 ![image](https://github.com/user-attachments/assets/21c3ef51-765f-49c1-ad04-b591f3660788)
 
