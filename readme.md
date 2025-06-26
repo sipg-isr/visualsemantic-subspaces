@@ -13,6 +13,7 @@ Learning image representations that capture rich semantic relationships remains 
 
 ![image](https://github.com/user-attachments/assets/21c3ef51-765f-49c1-ad04-b591f3660788)
 
+The capability of explicitely represent negations is one key feature of this subspace representation. The figure shows that massive systems like CLIP that do not have structured representations by design do not cope with "negations" among other queries whereas by imposing a subspace structure the negation is naturally represented by the orthogonal complement.
 
 ## Code
 
